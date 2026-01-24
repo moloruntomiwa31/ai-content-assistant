@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
 	ArrowLeft,
@@ -10,48 +9,26 @@ import {
 	Copy,
 	RefreshCw,
 } from "lucide-react";
+import { useSocialCaptionStore } from "../../stores";
 
 export default function SocialCaptions() {
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
-	const [thumbnail, setThumbnail] = useState<File | null>(null);
-	const [generatedCaption, setGeneratedCaption] = useState("");
-	const [isGenerating, setIsGenerating] = useState(false);
-	const [copied, setCopied] = useState(false);
+	const {
+		title,
+		description,
+		thumbnail,
+		generatedCaption,
+		isGenerating,
+		copied,
+		setTitle,
+		setDescription,
+		setThumbnail,
+		generateCaption,
+		copyToClipboard,
+	} = useSocialCaptionStore();
 
 	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) setThumbnail(file);
-	};
-
-	const generateCaption = async () => {
-		if (!title.trim()) return;
-
-		setIsGenerating(true);
-		setTimeout(() => {
-			const sampleCaption = `🚀 ${title} 🎯
-
-${description}
-
-✨ This is absolutely GAME-CHANGING! 💯
-
-🔥 Key highlights:
-• Amazing results guaranteed
-• Easy to follow steps
-• Perfect for beginners
-
-💬 What do you think? Drop your thoughts below! 👇
-
-#ContentCreation #AI #SocialMedia #Viral #MustWatch`;
-			setGeneratedCaption(sampleCaption);
-			setIsGenerating(false);
-		}, 2000);
-	};
-
-	const copyToClipboard = () => {
-		navigator.clipboard.writeText(generatedCaption);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
 	};
 
 	return (

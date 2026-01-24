@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
 	ArrowLeft,
@@ -14,84 +13,30 @@ import {
 import FileUpload from "../../components/shared/FileUpload";
 import InputField from "../../components/shared/InputField";
 import OutputPanel from "../../components/shared/OutputPanel";
+import { useYouTubeSEOStore } from "../../stores";
 
 export default function YouTubeSEO() {
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
-	const [thumbnail, setThumbnail] = useState<File | null>(null);
-	const [targetKeywords, setTargetKeywords] = useState("");
-
-	const [optimizedTitle, setOptimizedTitle] = useState("");
-	const [optimizedTags, setOptimizedTags] = useState("");
-	const [optimizedDescription, setOptimizedDescription] = useState("");
-	const [hashtags, setHashtags] = useState("");
-
-	const [isGenerating, setIsGenerating] = useState(false);
-	const [copiedTitle, setCopiedTitle] = useState(false);
-	const [copiedTags, setCopiedTags] = useState(false);
-	const [copiedDescription, setCopiedDescription] = useState(false);
-	const [copiedHashtags, setCopiedHashtags] = useState(false);
-
-	const generateOptimizedContent = async () => {
-		if (!title.trim()) return;
-
-		setIsGenerating(true);
-		setTimeout(() => {
-			setOptimizedTitle(`${title} | Complete Guide 2024 - MUST WATCH!`);
-
-			setOptimizedTags(
-				`${title.toLowerCase().replace(/\s+/g, ", ")}, tutorial, guide, how to, step by step, beginner friendly, 2024, tips, tricks, learn, educational, complete guide, must watch, viral, trending, best practices, expert advice, professional, advanced, secrets`,
-			);
-
-			setOptimizedDescription(`🎯 ${title} - Everything You Need to Know!
-
-${description}
-
-🔥 In this comprehensive guide, you'll discover:
-✅ Step-by-step instructions
-✅ Pro tips and tricks
-✅ Common mistakes to avoid
-✅ Real-world examples
-
-⏰ Timestamps:
-00:00 Introduction
-02:30 Getting Started
-05:45 Advanced Techniques
-08:20 Final Tips
-
-💡 Don't forget to LIKE this video if it helped you and SUBSCRIBE for more amazing content!
-
-🔔 Turn on notifications to never miss our latest uploads!
-
-#${title.replace(/\s+/g, "")} #Tutorial #Guide #2024 #MustWatch #Educational #HowTo #Tips #Tricks #Learn`);
-
-			setHashtags(
-				"#Tutorial #Guide #2024 #Educational #HowTo #Tips #Viral #MustWatch #Learn #Success #Growth #Content #YouTube #SEO #Trending",
-			);
-
-			setIsGenerating(false);
-		}, 2500);
-	};
-
-	const copyToClipboard = (
-		text: string,
-		type: "title" | "tags" | "description" | "hashtags",
-	) => {
-		navigator.clipboard.writeText(text);
-		if (type === "title") {
-			setCopiedTitle(true);
-			setTimeout(() => setCopiedTitle(false), 2000);
-		} else if (type === "tags") {
-			setCopiedTags(true);
-			setTimeout(() => setCopiedTags(false), 2000);
-		} else if (type === "description") {
-			setCopiedDescription(true);
-			setTimeout(() => setCopiedDescription(false), 2000);
-		} else {
-			setCopiedHashtags(true);
-			setTimeout(() => setCopiedHashtags(false), 2000);
-		}
-	};
+	const {
+		title,
+		description,
+		thumbnail,
+		targetKeywords,
+		optimizedTitle,
+		optimizedTags,
+		optimizedDescription,
+		hashtags,
+		isGenerating,
+		copiedTitle,
+		copiedTags,
+		copiedDescription,
+		copiedHashtags,
+		setTitle,
+		setDescription,
+		setThumbnail,
+		setTargetKeywords,
+		generateOptimizedContent,
+		copyToClipboard,
+	} = useYouTubeSEOStore();
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
