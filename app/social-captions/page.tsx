@@ -10,6 +10,10 @@ import {
 	RefreshCw,
 } from "lucide-react";
 import { useSocialCaptionStore } from "../../stores";
+import { useGenerateCaption } from "@/lib/hooks";
+import { SEOScore } from "@/components/shared/SEOScore";
+import { Features } from "@/components/shared/Features";
+import { useEffect } from "react";
 
 export default function SocialCaptions() {
 	const {
@@ -17,19 +21,58 @@ export default function SocialCaptions() {
 		description,
 		thumbnail,
 		generatedCaption,
-		isGenerating,
 		copied,
 		setTitle,
 		setDescription,
 		setThumbnail,
-		generateCaption,
+		setGeneratedCaption,
+		setIsGenerating,
+		setError,
 		copyToClipboard,
+		error,
+		isGenerating,
 	} = useSocialCaptionStore();
+
+	const { mutate: generateCaption, isPending } = useGenerateCaption();
+
+	useEffect(() => {
+		setIsGenerating(isPending);
+	}, [isPending, setIsGenerating]);
+
+	const handleGenerateCaption = () => {
+		if (!title.trim()) return;
+
+		setError(null);
+		generateCaption(
+			{ title, description, platform: "general" },
+			{
+				onSuccess: (data) => {
+					setGeneratedCaption(data);
+				},
+				onError: (error) => {
+					setError(error.message);
+				},
+			},
+		);
+	};
 
 	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) setThumbnail(file);
 	};
+
+	// Calculate a simple engagement score for social captions (0-100)
+	const engagementScore = generatedCaption
+		? Math.min(
+				100,
+				Math.floor(
+					30 + // base score
+						(generatedCaption.caption.length / 200) * 30 + // caption length score (up to 30)
+						(generatedCaption.hashtags?.length || 0) * 3 + // hashtag score (up to 30)
+						(generatedCaption.emojis?.length || 0) * 2, // emoji score (up to 20)
+				),
+			)
+		: 0;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
@@ -144,12 +187,18 @@ export default function SocialCaptions() {
 							/>
 						</div>
 
+						{error && (
+							<div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-200 text-sm">
+								{error}
+							</div>
+						)}
+
 						<button
-							onClick={generateCaption}
-							disabled={!title.trim() || isGenerating}
+							onClick={handleGenerateCaption}
+							disabled={!title.trim() || isPending}
 							className="w-full bg-gradient-to-r from-primary-600 to-secondary-600 hover:from-primary-700 hover:to-secondary-700 disabled:from-neutral-400 disabled:to-neutral-500 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:hover:scale-100"
 						>
-							{isGenerating ? (
+							{isPending ? (
 								<>
 									<RefreshCw className="w-5 h-5 animate-spin" />
 									Generating...
@@ -169,22 +218,30 @@ export default function SocialCaptions() {
 							Generated Caption
 						</h3>
 
-						<div className="bg-neutral-50 dark:bg-neutral-700 rounded-2xl p-6 mb-6 min-h-[300px]">
-							{generatedCaption ? (
-								<pre className="whitespace-pre-wrap text-neutral-800 dark:text-neutral-200 font-sans leading-relaxed">
-									{generatedCaption}
-								</pre>
-							) : (
-								<div className="flex items-center justify-center h-full text-center text-neutral-500 dark:text-neutral-400">
-									<div>
-										<MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-										<p className="text-lg mb-2">
-											Your caption will appear here
-										</p>
-										<p className="text-sm">
-											Enter a title and click generate to get started
-										</p>
+						<div className="bg-neutral-50 dark:bg-neutral-700 rounded-2xl p-6 mb-6 min-h-[300px] flex flex-col">
+							<div className="flex-1">
+								{generatedCaption ? (
+									<pre className="whitespace-pre-wrap text-neutral-800 dark:text-neutral-200 font-sans leading-relaxed">
+										{generatedCaption.caption}
+									</pre>
+								) : (
+									<div className="flex items-center justify-center h-full text-center text-neutral-500 dark:text-neutral-400">
+										<div>
+											<MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
+											<p className="text-lg mb-2">
+												Your caption will appear here
+											</p>
+											<p className="text-sm">
+												Enter a title and click generate to get started
+											</p>
+										</div>
 									</div>
+								)}
+							</div>
+
+							{generatedCaption && (
+								<div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-600">
+									<SEOScore score={engagementScore} isLoading={isPending} />
 								</div>
 							)}
 						</div>
@@ -199,8 +256,8 @@ export default function SocialCaptions() {
 								{copied ? "Copied!" : "Copy Caption"}
 							</button>
 							<button
-								onClick={generateCaption}
-								disabled={!title.trim() || isGenerating}
+								onClick={handleGenerateCaption}
+								disabled={!title.trim() || isPending}
 								className="flex-1 border border-neutral-300 dark:border-neutral-600 hover:border-accent-500 disabled:border-neutral-300 text-neutral-700 dark:text-neutral-300 hover:text-accent-600 disabled:text-neutral-400 font-medium py-3 px-4 rounded-xl transition-colors disabled:cursor-not-allowed"
 							>
 								Regenerate
@@ -209,45 +266,30 @@ export default function SocialCaptions() {
 					</div>
 				</div>
 
-				<div className="mt-20">
-					<h3 className="text-3xl font-display font-bold text-center text-neutral-900 dark:text-white mb-12">
-						What Makes Our Captions Special?
-					</h3>
-					<div className="grid md:grid-cols-3 gap-8">
-						<div className="text-center group">
-							<div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-								<Sparkles className="w-8 h-8 text-primary-600" />
-							</div>
-							<h4 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-								AI-Powered Enhancement
-							</h4>
-							<p className="text-neutral-600 dark:text-neutral-400">
-								Advanced grammar correction and style improvement
-							</p>
-						</div>
-						<div className="text-center group">
-							<div className="w-16 h-16 bg-secondary-100 dark:bg-secondary-900 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-								<MessageCircle className="w-8 h-8 text-secondary-600" />
-							</div>
-							<h4 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-								Emoji Integration
-							</h4>
-							<p className="text-neutral-600 dark:text-neutral-400">
-								Perfect emoji placement for maximum engagement
-							</p>
-						</div>
-						<div className="text-center group">
-							<div className="w-16 h-16 bg-accent-100 dark:bg-accent-900 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-								<Upload className="w-8 h-8 text-accent-600" />
-							</div>
-							<h4 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">
-								Platform Optimized
-							</h4>
-							<p className="text-neutral-600 dark:text-neutral-400">
-								Formatted perfectly for WhatsApp and social media
-							</p>
-						</div>
-					</div>
+				<div>
+					<Features
+						title="What Makes Our Captions Special?"
+						features={[
+							{
+								icon: Sparkles,
+								title: "AI-Powered Enhancement",
+								description: "Advanced grammar correction and style improvement",
+								color: "primary",
+							},
+							{
+								icon: MessageCircle,
+								title: "Emoji Integration",
+								description: "Perfect emoji placement for maximum engagement",
+								color: "secondary",
+							},
+							{
+								icon: Upload,
+								title: "Platform Optimized",
+								description: "Formatted perfectly for WhatsApp and social media",
+								color: "accent",
+							},
+						]}
+					/>
 				</div>
 			</main>
 		</div>
