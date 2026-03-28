@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 			);
 		}
 
-		const model = genAI.getGenerativeModel({ model: "gemini-3-flash-preview" });
+		const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 		const prompt = `You are an expert YouTube SEO specialist. Your task is to optimize video content for maximum visibility and engagement.
 

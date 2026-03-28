@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useSocialCaptionStore } from "../../stores";
 import { useGenerateCaption } from "@/lib/hooks";
-import { SEOScore } from "@/components/shared/SEOScore";
 import { Features } from "@/components/shared/Features";
 import { useEffect } from "react";
 
@@ -19,12 +18,10 @@ export default function SocialCaptions() {
 	const {
 		title,
 		description,
-		thumbnail,
 		generatedCaption,
 		copied,
 		setTitle,
 		setDescription,
-		setThumbnail,
 		setGeneratedCaption,
 		setIsGenerating,
 		setError,
@@ -56,23 +53,6 @@ export default function SocialCaptions() {
 		);
 	};
 
-	const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const file = e.target.files?.[0];
-		if (file) setThumbnail(file);
-	};
-
-	// Calculate a simple engagement score for social captions (0-100)
-	const engagementScore = generatedCaption
-		? Math.min(
-				100,
-				Math.floor(
-					30 + // base score
-						(generatedCaption.caption.length / 200) * 30 + // caption length score (up to 30)
-						(generatedCaption.hashtags?.length || 0) * 3 + // hashtag score (up to 30)
-						(generatedCaption.emojis?.length || 0) * 2, // emoji score (up to 20)
-				),
-			)
-		: 0;
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
@@ -109,7 +89,7 @@ export default function SocialCaptions() {
 						</span>
 					</h2>
 					<p className="text-xl text-neutral-600 dark:text-neutral-400 max-w-3xl mx-auto mb-8">
-						Upload your thumbnail, title, and description. Our AI will create
+						Enter your title and description. Our AI will create
 						engaging, emoji-rich captions perfect for WhatsApp and social
 						sharing.
 					</p>
@@ -118,48 +98,10 @@ export default function SocialCaptions() {
 				<div className="grid lg:grid-cols-2 gap-12">
 					<div className="bg-white dark:bg-neutral-800 rounded-3xl p-8 shadow-xl border border-neutral-200 dark:border-neutral-700">
 						<h3 className="text-2xl font-bold text-neutral-900 dark:text-white mb-6 flex items-center gap-3">
-							<Upload className="w-6 h-6 text-primary-600" />
-							Upload Your Content
+							<Sparkles className="w-6 h-6 text-primary-600" />
+							Enter Your Content
 						</h3>
 
-						<div className="mb-6">
-							<label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
-								Thumbnail Image
-							</label>
-							<div className="relative">
-								<input
-									type="file"
-									accept="image/*"
-									onChange={handleFileUpload}
-									className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-								/>
-								<div className="border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-2xl p-8 text-center hover:border-primary-500 transition-colors">
-									{thumbnail ? (
-										<div className="space-y-2">
-											<div className="w-16 h-16 bg-primary-100 dark:bg-primary-900 rounded-xl mx-auto flex items-center justify-center">
-												<Upload className="w-8 h-8 text-primary-600" />
-											</div>
-											<p className="text-neutral-700 dark:text-neutral-300 font-medium">
-												{thumbnail.name}
-											</p>
-											<p className="text-sm text-neutral-500">
-												Click to change
-											</p>
-										</div>
-									) : (
-										<>
-											<Upload className="w-12 h-12 text-neutral-400 mx-auto mb-4" />
-											<p className="text-neutral-600 dark:text-neutral-400 mb-2">
-												Drop your thumbnail here or click to browse
-											</p>
-											<p className="text-sm text-neutral-500">
-												PNG, JPG up to 10MB
-											</p>
-										</>
-									)}
-								</div>
-							</div>
-						</div>
 
 						<div className="mb-6">
 							<label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2">
@@ -238,12 +180,6 @@ export default function SocialCaptions() {
 									</div>
 								)}
 							</div>
-
-							{generatedCaption && (
-								<div className="mt-4 pt-4 border-t border-neutral-200 dark:border-neutral-600">
-									<SEOScore score={engagementScore} isLoading={isPending} />
-								</div>
-							)}
 						</div>
 
 						<div className="flex gap-3">

@@ -14,7 +14,6 @@ import { useEffect } from "react";
 import FileUpload from "../../components/shared/FileUpload";
 import InputField from "../../components/shared/InputField";
 import OutputPanel from "../../components/shared/OutputPanel";
-import { SEOScore } from "../../components/shared/SEOScore";
 import { Features } from "../../components/shared/Features";
 import { useYouTubeSEOStore } from "../../stores";
 import { useGenerateSEO } from "@/lib/hooks";
@@ -180,22 +179,6 @@ export default function YouTubeSEO() {
 					</button>
 				</div>
 
-				{/* SEO Score Section */}
-				{generatedSEO && (
-					<div className="bg-white dark:bg-neutral-800 rounded-3xl p-6 sm:p-8 shadow-xl border border-neutral-200 dark:border-neutral-700 mb-12 sm:mb-16">
-						<h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white mb-8 flex items-center gap-3">
-							<Target className="w-5 h-5 sm:w-6 sm:h-6 text-secondary-600" />
-							<span>Overall SEO Score</span>
-						</h3>
-						<div className="flex items-center justify-center">
-							<SEOScore
-								score={generatedSEO?.seoScore || 0}
-								isLoading={isPending}
-							/>
-						</div>
-					</div>
-				)}
-
 				{/* Output Sections */}
 				<div className="grid lg:grid-cols-2 gap-8 sm:gap-12 mb-12 sm:mb-16">
 					<OutputPanel
@@ -218,7 +201,7 @@ export default function YouTubeSEO() {
 
 					<OutputPanel
 						title="SEO Tags/Keywords"
-						icon={Target}
+						icon={Hash}
 						content={tagContentDisplay}
 						placeholder={{
 							icon: Target,
@@ -275,8 +258,8 @@ export default function YouTubeSEO() {
 						title="YouTube SEO Features"
 						features={[
 							{
-								icon: Target,
-								title: "SEO Optimization",
+								icon: Video,
+								title: "YouTube Optimization",
 								description:
 									"Keyword-rich titles and descriptions for better ranking",
 								color: "secondary",

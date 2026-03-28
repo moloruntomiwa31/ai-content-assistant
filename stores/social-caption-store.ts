@@ -11,7 +11,6 @@ interface SocialCaptionStore extends ContentInput, GenerationState {
 	// Actions
 	setTitle: (title: string) => void;
 	setDescription: (description: string) => void;
-	setThumbnail: (thumbnail: File | null) => void;
 	setGeneratedCaption: (caption: SocialCaptionOutput | null) => void;
 	setIsGenerating: (isGenerating: boolean) => void;
 	setCopied: (copied: boolean) => void;
@@ -25,7 +24,6 @@ interface SocialCaptionStore extends ContentInput, GenerationState {
 const initialState = {
 	title: "",
 	description: "",
-	thumbnail: null,
 	generatedCaption: null,
 	isGenerating: false,
 	copied: false,
@@ -38,7 +36,6 @@ export const useSocialCaptionStore = create<SocialCaptionStore>((set, get) => ({
 
 	setTitle: (title) => set({ title }),
 	setDescription: (description) => set({ description }),
-	setThumbnail: (thumbnail) => set({ thumbnail }),
 	setGeneratedCaption: (generatedCaption) =>
 		set({ generatedCaption, lastGenerated: new Date() }),
 	setIsGenerating: (isGenerating) => set({ isGenerating }),
